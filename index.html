@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التحقق والدخول</title>
+
+  <!-- خطوط -->
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #104E8B;
+      --accent-color: #D4AF37;
+      --bg-color: #f5f5f5;
+      --text-color: #333;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Reem Kufi', sans-serif;
+      background: linear-gradient(180deg, #f5f5f5 0%, #e1e8f0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 480px;
+      background-color: white;
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.8s ease forwards;
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 1.1rem;
+      color: var(--text-color);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Amiri', serif;
+      direction: rtl;
+    }
+
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 5px var(--primary-color);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      color: white;
+      margin-top: 15px;
+      font-family: 'Reem Kufi', sans-serif;
+    }
+
+    button:hover {
+      background-color: var(--accent-color);
+      color: #222;
+    }
+
+    #error {
+      color: #e74c3c;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(50px); opacity: 0 }
+      to { transform: translateY(0); opacity: 1 }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      input {
+        font-size: 1.2rem;
+      }
+
+      button {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="form-container" style="display: none;">
+    <h3>أدخل بياناتك</h3>
+    <label for="name">الاسم:</label>
+    <input type="text" id="name" placeholder="ادخل اسمك كاملاً" required />
+    <label for="phone">رقم الهاتف:</label>
+    <input type="tel" id="phone" placeholder="مثلاً: 01234567890" required />
+    <button id="send-code">إرسال الكود</button>
+  </div>
+
+  <div class="container" id="verify-container" style="display: none;">
+    <h3>ادخل الكود</h3>
+    <h2>تم إرسال الكود عبر الواتساب أو المكالمة</h2>
+    <input type="text" id="user-code" maxlength="6" placeholder="مثلاً: Ab12#X" />
+    <button id="verify-btn">تحقق</button>
+    <p id="error"></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (() => {
+      emailjs.init("J5-pWOUh3XOd_xxm4"); // تأكد من إدخال Public Key الصحيح
+
+      const formC = document.getElementById('form-container');
+      const verifyC = document.getElementById('verify-container');
+
+      // عرض النموذج الأول
+      if (localStorage.getItem('verified') === 'true') {
+        window.location.href = "main.html";
+        return;
+      }
+
+      formC.style.display = 'block';
+
+      const generateCode = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      };
+
+      let currentCode = "";
+
+      document.getElementById('send-code').addEventListener('click', () => {
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        if (!name || !phone) {
+          alert("من فضلك ادخل الاسم والرقم");
+          return;
+        }
+
+        currentCode = generateCode();
+
+        emailjs.send("service_e64bzas", "template_9hcm9jf", {
+          to_email: "w957315@gmail.com",
+          user_name: name,
+          user_phone: phone,
+          verification_code: currentCode
+        }).then(() => {
+          formC.style.display = 'none';
+          verifyC.style.display = 'block';
+        }).catch(err => {
+          console.error("خطأ في إرسال الكود:", err);
+          alert("فشل في الإرسال، حاول لاحقًا.");
+        });
+      });
+
+      document.getElementById('verify-btn').addEventListener('click', () => {
+        const input = document.getElementById('user-code').value.trim();
+        const errorP = document.getElementById('error');
+        if (input === currentCode) {
+          localStorage.setItem('verified', 'true');
+          window.location.href = "main.html";
+        } else {
+          errorP.textContent = "الكود غير صحيح، حاول مرة أخرى.";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

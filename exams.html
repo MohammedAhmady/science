@@ -1,0 +1,943 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Science Quiz Grade 7 – Term 2 2025</title>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cambria+Math&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary-color: #8B4513;
+  --secondary-color: #D2B48C;
+  --accent-color: #A0522D;
+  --text-light: #fff;
+  --text-dark: #3D2314;
+  --bg-light: #F5F5DC;
+  --border-color: #CD853F;
+  --radius: 8px;
+  --font-num: "Cambria Math", serif;
+  --font-eng: "EB Garamond", serif;
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  background: var(--bg-light);
+  color: var(--text-dark);
+  font-family: var(--font-eng);
+  display:flex; flex-direction:column; min-height:100vh;
+}
+header {
+  background: var(--primary-color);
+  color: var(--text-light);
+  padding:1rem;
+  display:flex; align-items:center; justify-content:space-between;
+}
+header h1 {
+  font-family:'Reem Kufi',sans-serif;
+  font-size:1.4rem;
+}
+header a.home {
+  color: var(--text-light);
+  font-family: var(--font-num);
+  text-decoration:none;
+  font-size:1.2rem;
+}
+nav {
+  display:flex;
+  background: var(--secondary-color);
+}
+nav button {
+  flex:1;
+  padding:0.7rem;
+  border:none;
+  background: var(--secondary-color);
+  border-right:1px solid var(--accent-color);
+  font-family:'Reem Kufi',sans-serif;
+  font-size:1rem;
+  cursor:pointer;
+}
+nav button:last-child { border-right:none; }
+nav button.active {
+  background: var(--accent-color);
+  color:#fff;
+}
+main {
+  flex:1;
+  padding:1rem;
+  animation: fadeIn 0.5s ease;
+}
+.controls {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1rem;
+  font-family: var(--font-num);
+}
+#timer { font-size:1.1rem; }
+.question-card {
+  background:#fff;
+  border:1px solid var(--border-color);
+  border-radius:var(--radius);
+  padding:1rem;
+  margin-bottom:1rem;
+  box-shadow:2px 2px 6px rgba(0,0,0,0.1);
+}
+.question-card h4 {
+  margin-bottom:0.5rem;
+  font-family:'Reem Kufi',sans-serif;
+}
+.question-card p {
+  margin-bottom:0.5rem;
+}
+.question-card ul {
+  list-style:none;
+}
+.question-card li { margin:0.5rem 0; }
+.question-card button {
+  width:100%;
+  padding:0.5rem;
+  text-align:left;
+  border:1px solid var(--border-color);
+  border-radius:var(--radius);
+  background: var(--bg-light);
+  cursor:pointer;
+  transition: background 0.2s;
+  font-family: var(--font-eng);
+}
+.question-card button:hover { background:#eee; }
+.feedback {
+  margin-top:0.5rem;
+  font-weight:bold;
+  font-family: var(--font-num);
+}
+#scorePanel {
+  text-align:center;
+  margin-top:1rem;
+  font-family: var(--font-num);
+}
+#scorePanel button {
+  margin-top:0.5rem;
+  padding:0.6rem 1rem;
+  border:none;
+  background: var(--primary-color);
+  color:#fff;
+  border-radius:var(--radius);
+  cursor:pointer;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@media (max-width:480px){
+  header h1 { font-size:1.2rem; }
+  nav button { font-size:0.9rem; padding:0.5rem; }
+}
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>Science Quiz – Grade 7 Term 2</h1>
+    <a href="main.html" class="home">🏠</a>
+  </header>
+
+  <nav>
+    <button data-sec="unit1" class="active">Chemical Substances</button>
+    <button data-sec="unit2">Energy & Uses</button>
+    <button data-sec="unit3">Environment & Genetics</button>
+    <button data-sec="unit4">Natural Cycles</button>
+    <button data-sec="mixed">Review</button>
+  </nav>
+
+  <main>
+    <div class="controls">
+      <label><input type="checkbox" id="useTimer"> Use Timer (1:30)</label>
+      <div id="timer">01:30:00</div>
+    </div>
+    <div id="quiz"></div>
+    <div id="scorePanel" style="display:none;">
+      <div>Your Score: <span id="scoreVal"></span></div>
+      <button id="retryBtn">Retake Test</button>
+    </div>
+  </main>
+
+  <script>// quiz.js
+// Science Quiz – Grade 7 Term 2 2025
+// 90 questions (4 units × 15) + 30 mixed review
+
+const quizes = {
+  unit1: [
+    // Easy (level 1)
+    {
+      text: "Which of these are from properties of metals?",
+      choices: [
+        "Non-conductive",
+        "Good conductor",
+        "Colorless",
+        "Combines with air to form water"
+      ],
+      a: 1,
+      l: 1,
+      reason: "الفلزات عادةً بتكون موصلة ممتازة للكهرباء والحرارة بسبب توافر إلكترونات حرة."
+    },
+    {
+      text: "What is the color of blue litmus paper in acid?",
+      choices: ["Red", "Blue", "Green", "Colorless"],
+      a: 0,
+      l: 1,
+      reason: "ورقة الليتموس الزرقاء بتتحول للأحمر في محلول حمضي."
+    },
+    {
+      text: "What is the product of reaction between acid and alkali?",
+      choices: ["Salt + gas", "Salt + water", "New acid + water", "New base + salt"],
+      a: 1,
+      l: 1,
+      reason: "تفاعل التحييد بين الحمض والقاعدة دايمًا بيدي ملح وماء."
+    },
+    {
+      text: "Which of these is considered a salt in daily life?",
+      choices: ["Water", "Sodium chloride", "Sodium hydroxide", "Carbon dioxide"],
+      a: 1,
+      l: 1,
+      reason: "NaCl هو الملح اللي بنستخدمه في الأكل."
+    },
+    // Normal (level 2)
+    {
+      text: "Which of these is strong alkali?",
+      choices: ["H₂SO₄", "NaOH", "CO₂", "NaCl"],
+      a: 1,
+      l: 2,
+      reason: "NaOH مثال على قاعدة قوية."
+    },
+    {
+      text: "The atom with 7 electrons in outer shell is:",
+      choices: ["Metal", "Non-metal", "Metalloid", "Noble gas"],
+      a: 1,
+      l: 2,
+      reason: "الكلور Cl عنده 7 إلكترونات في الغلاف الخارجي، فهو لا فلز."
+    },
+    {
+      text: "Which of these is liquid metal at room temperature?",
+      choices: ["Mercury", "Sodium", "Iron", "Copper"],
+      a: 0,
+      l: 2,
+      reason: "الزئبق Hg هو الفلز الوحيد السائل عند درجة حرارة الغرفة."
+    },
+    // Hard (level 3)
+    {
+      text: "Result of reaction between KOH and HCl?",
+      choices: ["KCl + H₂O", "NaCl + H₂", "KClO + H₂", "No reaction"],
+      a: 0,
+      l: 3,
+      reason: "هو تفاعل تحييد بين HCl وKOH بيدي KCl وماء."
+    },
+    {
+      text: "Result of reaction between H₂SO₄ and NaOH?",
+      choices: ["Na₂SO₄ + H₂O", "NaHSO₄ + H₂O", "Na₂SO₄ + H₂", "No reaction"],
+      a: 0,
+      l: 3,
+      reason: "H₂SO₄ + 2 NaOH → Na₂SO₄ + 2 H₂O."
+    },
+    // Very Hard (level 4)
+    {
+      text: "Type of solution if pH ≈ 14?",
+      choices: ["Acidic", "Basic", "Neutral", "Unknown"],
+      a: 1,
+      l: 4,
+      reason: "pH = 14 يعني محلول قلوي قوي."
+    },
+    {
+      text: "What happens when NaCl dissolves in water?",
+      choices: ["Na⁺ + Cl⁻", "Na⁺ + OH⁻", "H⁺ + Cl⁻", "No dissociation"],
+      a: 0,
+      l: 4,
+      reason: "NaCl بينفكك لإيونات Na⁺ وCl⁻ في الماء."
+    },
+    // Fill to 15 items: replicate pattern or add dummy if missing
+    {
+      text: "Which of these is NOT a property of metals?",
+      choices: ["Malleability", "High melting point", "Poor conductor", "Lustre"],
+      a: 2,
+      l: 2,
+      reason: "الموصلية المنخفضة ليست من خصائص الفلزات."
+    },
+    {
+      text: "Blue litmus paper in base turns:",
+      choices: ["Red", "Blue", "Green", "Colorless"],
+      a: 1,
+      l: 1,
+      reason: "الورقة الزرقاء تظل زرقاء في المحلول القلوي."
+    },
+    {
+      text: "Neutralization reaction always produces:",
+      choices: ["Salt + water", "Gas", "Acid", "Base"],
+      choices: ["Salt + water", "Gas", "Acid", "Base"],
+      a: 0,
+      l: 2,
+      reason: "نتيجة التحييد ملح وماء."
+    },
+    {
+      text: "A salt is:",
+      choices: ["Acid", "Base", "Compound of ions", "Gas"],
+      a: 2,
+      l: 3,
+      reason: "الملح مركب أيوني."
+    },
+    {
+      text: "Strong acid example:",
+      choices: ["HCl", "CH₃COOH", "H₂O", "NaOH"],
+      a: 0,
+      l: 2,
+      reason: "HCl حمض قوي."
+    }
+  ],
+
+  unit2: [
+    // Easy
+    {
+      text: "A book on a high shelf has which energy?",
+      choices: ["Kinetic", "Potential", "Thermal", "Nuclear"],
+      a: 1,
+      l: 1,
+      reason: "الكتاب على ارتفاع يمتلك طاقة كامنة جذب."
+    },
+    {
+      text: "A stationary car has:",
+      choices: ["Kinetic energy", "Potential energy", "No kinetic energy", "Electrical energy"],
+      a: 2,
+      l: 1,
+      reason: "السيارة المتوقفة ليس لها طاقة حركية."
+    },
+    {
+      text: "At the top of a thrown ball kinetic energy is:",
+      choices: ["Max", "Zero", "Half", "Variable"],
+      choices: ["Max", "Zero", "Half", "Variable"],
+      a: 1,
+      l: 1,
+      reason: "عند أعلى نقطة السرعة = 0 فطاقة الحركة = 0."
+    },
+    {
+      text: "A moving car has which energy?",
+      choices: ["Potential", "Kinetic", "Thermal", "Chemical"],
+      a: 1,
+      l: 1,
+      reason: "السيارة المتحركة تمتلك طاقة حركية."
+    },
+    // Normal
+    {
+      text: "Doubling speed doubles kinetic energy by:",
+      choices: ["2×", "4×", "½×", "No change"],
+      a: 1,
+      l: 2,
+      reason: "KE ∝ v²، مضاعفة v → 4× الطاقة."
+    },
+    {
+      text: "Heavier car at same speed has:",
+      choices: ["Less KE", "More KE", "Same KE", "No KE"],
+      a: 1,
+      l: 2,
+      reason: "KE ∝ mass، أكبر كتلة → طاقة أكبر."
+    },
+    {
+      text: "Compressed spring has:",
+      choices: ["Kinetic", "Potential", "Sound", "Light"],
+      a: 1,
+      l: 2,
+      reason: "النابض المضغوط يحتوي على طاقة كامنة."
+    },
+    {
+      text: "At bottom of pendulum KE is:",
+      choices: ["Max", "Min", "Zero", "Variable"],
+      choices: ["Max", "Min", "Zero", "Variable"],
+      a: 0,
+      l: 2,
+      reason: "السرعة أكبر في الأسفل → KE أقصى قيمة."
+    },
+    // Hard
+    {
+      text: "SI unit of energy is:",
+      choices: ["Joule", "Calorie", "Ampere", "Volt"],
+      a: 0,
+      l: 3,
+      reason: "اليول هي وحدة الطاقة."
+    },
+    {
+      text: "Doubling height changes PE by:",
+      choices: ["2×", "4×", "½×", "Same"],
+      a: 0,
+      l: 3,
+      reason: "PE = mgh، مضاعفة h → مضاعفة PE."
+    },
+    {
+      text: "Sum of KE + PE is:",
+      choices: ["Mechanical energy", "Chemical", "Thermal", "Electrical"],
+      a: 0,
+      l: 3,
+      reason: "المجموع يسمى الطاقة الميكانيكية."
+    },
+    {
+      text: "At highest point of pendulum:",
+      choices: ["KE max", "PE max", "Both zero", "None"],
+      a: 1,
+      l: 3,
+      reason: "السرعة 0 → KE=0، PE أقصى قيمة."
+    },
+    // Very Hard
+    {
+      text: "Tripling speed makes KE ≈:",
+      choices: ["3×", "6×", "9×", "8×"],
+      a: 2,
+      l: 4,
+      reason: "KE ∝ v²، (3v)²=9×."
+    },
+    {
+      text: "Stopping car converts KE to:",
+      choices: ["PE", "Thermal", "Light", "Disappears"],
+      a: 1,
+      l: 4,
+      reason: "عند الكبح تتحول الطاقة الحركية لحرارة."
+    },
+    {
+      text: "Doubling height → PE:",
+      choices: ["2×", "4×", "½×", "Same"],
+      a: 0,
+      l: 4,
+      reason: "PE ∝ h، مضاعفة h → مضاعفة PE."
+    }
+  ],
+
+  unit3: [
+    // Easy
+    {
+      text: "Which is a producer in a food web?",
+      choices: ["Palm tree", "Lion", "Ant", "Mushroom"],
+      a: 0,
+      l: 1,
+      reason: "النباتات تصنع غذاءها بالتركيب الضوئي."
+    },
+    {
+      text: "Which is a herbivore?",
+      choices: ["Cow", "Tiger", "Chicken", "Owl"],
+      a: 0,
+      l: 1,
+      reason: "البقرة تأكل نباتات فقط."
+    },
+    {
+      text: "Which is a carnivore?",
+      choices: ["Lion", "Rabbit", "Cow", "Giraffe"],
+      a: 0,
+      l: 1,
+      reason: "الأسد يأكل لحوم حيوانات أخرى."
+    },
+    {
+      text: "Main energy source in food chain?",
+      choices: ["Soil", "Plants", "Sun", "Air"],
+      a: 2,
+      l: 1,
+      reason: "الشمس مصدر الطاقة الأساسي."
+    },
+    // Normal
+    {
+      text: "Which is a decomposer?",
+      choices: ["Mushroom", "Grass", "Elephant", "Fish"],
+      a: 0,
+      l: 2,
+      reason: "الفطر يحلل المواد العضوية الميتة."
+    },
+    {
+      text: "Removing wolves → rabbits number:",
+      choices: ["Decrease", "No change", "Increase", "Turn into wolves"],
+      a: 2,
+      l: 2,
+      reason: "غياب المفترس يزيد أعداد الأرانب."
+    },
+    {
+      text: "Non-hereditary trait example?",
+      choices: ["Height", "Eye color", "Language learning", "Hair color"],
+      a: 2,
+      l: 2,
+      reason: "تعلم لغة يعتمد على البيئة."
+    },
+    {
+      text: "Genetic information stored in:",
+      choices: ["Proteins", "DNA", "Fats", "Ions"],
+      a: 1,
+      l: 2,
+      reason: "الـDNA يحمل المعلومات الوراثية."
+    },
+    // Hard
+    {
+      text: "Random change in genes is:",
+      choices: ["Evolution", "Migration", "Mutation", "Stabilization"],
+      a: 2,
+      l: 3,
+      reason: "الطفرة هي تغيير في ترتيب مادة الـDNA."
+    },
+    {
+      text: "Trait more affected by environment:",
+      choices: ["Eye color", "Sun tan", "Ear shape", "Blood type"],
+      a: 1,
+      l: 3,
+      reason: "التسمير يعتمد على التعرض للشمس."
+    },
+    {
+      text: "Example of genetic variation in siblings:",
+      choices: ["Birthmarks", "Different leg count", "Different eye color", "Single gene mutation"],
+      a: 2,
+      l: 3,
+      reason: "اختلاف لون العين وراثيًا بين إخوة."
+    },
+    {
+      text: "Chromosomes found in:",
+      choices: ["Cytoplasm", "Nucleus", "Cell membrane", "Mitochondria"],
+      a: 1,
+      l: 3,
+      reason: "الكروموسومات في نواة الخلية."
+    },
+    // Very Hard
+    {
+      text: "No plants in ecosystem → likely:",
+      choices: ["More carnivores", "Mass extinction", "No effect", "Only plants thrive"],
+      a: 1,
+      l: 4,
+      reason: "غياب المنتجات يعني انقراض المستهلكين."
+    },
+    {
+      text: "Substrate for photosynthesis is:",
+      choices: ["Water", "Sunlight", "CO₂", "All of the above"],
+      a: 3,
+      l: 4,
+      reason: "النباتات تحتاج ماء وضوء وثاني أكسيد الكربون."
+    },
+    {
+      text: "Identical twins have:",
+      choices: ["Different DNA", "Same DNA", "No DNA", "Mix after birth"],
+      a: 1,
+      l: 4,
+      reason: "التوأم المتطابق ينشأ من نفس البويضة."
+    }
+  ],
+
+  unit4: [
+    // Easy
+    {
+      text: "Which is a step in water cycle?",
+      choices: ["Condensation", "Electrolysis", "Photosynthesis", "Polymer decomposition"],
+      a: 0,
+      l: 1,
+      reason: "التكثف جزء من دورة الماء."
+    },
+    {
+      text: "Precipitation refers to:",
+      choices: ["Evaporation", "Condensation", "Precipitation", "Infiltration"],
+      a: 2,
+      l: 1,
+      reason: "الهطول هو سقوط المطر أو الثلج."
+    },
+    {
+      text: "Igneous rock forms by:",
+      choices: ["Cooling of magma", "Sediment compaction", "Heat transformation", "Photosynthesis"],
+      a: 0,
+      l: 1,
+      reason: "الصخور النارية تتشكل من تبريد الصهارة."
+    },
+    {
+      text: "Metamorphic rock from pressure & heat is:",
+      choices: ["Sedimentary", "Igneous", "Metamorphic", "Crystalline"],
+      a: 2,
+      l: 1,
+      reason: "الصخور المتحولة تتكون بالحرارة والضغط."
+    },
+    // Normal
+    {
+      text: "Collection in water cycle means:",
+      choices: ["Condensation", "Sublimation", "Collection", "Deposition"],
+      a: 2,
+      l: 2,
+      reason: "التجمع هو مياه الأنهار والبحيرات."
+    },
+    {
+      text: "Not part of rock cycle:",
+      choices: ["Weathering", "Melting", "Pressure & lithification", "Photosynthesis"],
+      a: 3,
+      l: 2,
+      reason: "التركيب الضوئي ليس جزء من دورة الصخور."
+    },
+    {
+      text: "Sedimentary rock formed by compaction is:",
+      choices: ["Igneous", "Sedimentary", "Metamorphic", "Mineral"],
+      a: 1,
+      l: 2,
+      reason: "الصخور الرسوبية تتكون من تراكم وضغط الحبيبات."
+    },
+    {
+      text: "Evaporation is:",
+      choices: ["Gas→liquid", "Liquid→gas", "Rainfall", "Collection"],
+      a: 1,
+      l: 2,
+      reason: "التبخر تحويل السائل لبخار."
+    },
+    // Hard
+    {
+      text: "Marble is example of:",
+      choices: ["Sedimentary", "Igneous", "Metamorphic", "Volcanic"],
+      a: 2,
+      l: 3,
+      reason: "الرخام صخر متحول."
+    },
+    {
+      text: "Erosion is NOT in water cycle:",
+      choices: ["Condensation", "Precipitation", "Erosion", "Evaporation"],
+      a: 2,
+      l: 3,
+      reason: "التعرية ليست جزءًا من دورة الماء."
+    },
+    {
+      text: "Granite is NOT formed by pressure/heat:",
+      choices: ["Sandstone", "Granite", "Conglomerate", "Schist"],
+      a: 1,
+      l: 3,
+      reason: "الجرانيت صخر ناري."
+    },
+    {
+      text: "Rain returns the cycle when it:",
+      choices: ["Falls & collects", "Boils", "Sublimates", "Clouds vanish"],
+      a: 0,
+      l: 3,
+      reason: "عودة المياه للأرض تكمل دورة الماء."
+    },
+    // Very Hard
+    {
+      text: "Rock that can metamorphose from sandstone is:",
+      choices: ["Granite", "Marble", "Sandstone", "Basalt"],
+      a: 2,
+      l: 4,
+      reason: "الحجر الرملي يمكن أن يتحول إلى كوارتزيت."
+    },
+    {
+      text: "Metallurgy is NOT part of:",
+      choices: ["Cooling magma", "Compaction", "Heat transformation", "Metallurgy"],
+      a: 3,
+      l: 4,
+      reason: "التعدين صناعي وليس جزء من دورة الصخور."
+    },
+    {
+      text: "When height doubled, PE:",
+      choices: ["Doubles", "Quadruples", "Halves", "Same"],
+      a: 0,
+      l: 4,
+      reason: "PE ∝ h."
+    }
+  ],
+
+  mixed: [
+    // 30 Review questions from final section
+    {
+      text: "What type of substance is NaCl?",
+      choices: ["Base", "Acid", "Salt", "Gas"],
+      a: 2,
+      l: 1,
+      reason: "NaCl هو ملح."
+    },
+    {
+      text: "What color does blue litmus turn in acid?",
+      choices: ["Red", "Blue", "Green", "Colorless"],
+      a: 0,
+      l: 1,
+      reason: "الورقة الزرقاء تتحول للأحمر في الحمض."
+    },
+    {
+      text: "Product of neutralizing acid with base?",
+      choices: ["Salt and water", "Oxygen", "Carbon dioxide", "Alcohol"],
+      a: 0,
+      l: 1,
+      reason: "الحمض + القاعدة → ملح + ماء."
+    },
+    {
+      text: "Stationary object at ground level has:",
+      choices: ["Kinetic energy", "Potential energy", "Thermal energy", "Nuclear energy"],
+      a: 1,
+      l: 1,
+      reason: "إذا كان مستوى الأرض مرجعاً فالطاقة الكامنة = 0."
+    },
+    {
+      text: "Which is a consumer in a food chain?",
+      choices: ["Grass", "Cow", "Sun", "Mushroom"],
+      a: 1,
+      l: 1,
+      reason: "البقرة تستهلك النباتات."
+    },
+    {
+      text: "Which molecule carries genetic information?",
+      choices: ["DNA", "Glucose", "Protein", "Lipid"],
+      a: 0,
+      l: 1,
+      reason: "الـDNA يحتوي على الجينات."
+    },
+    {
+      text: "In water cycle, evaporation is:",
+      choices: ["Water→gas", "Gas→liquid", "Rainfall", "Collection"],
+      a: 0,
+      l: 1,
+      reason: "التبخر تحويل السائل لبخار."
+    },
+    {
+      text: "Which rock forms by compaction and cementation?",
+      choices: ["Igneous", "Sedimentary", "Metamorphic", "Mineral"],
+      a: 1,
+      l: 1,
+      reason: "الصخور الرسوبية تتكون من الضغط والترسيب."
+    },
+    {
+      text: "Main energy source for producers?",
+      choices: ["Soil nutrients", "Water", "Sunlight", "Oxygen"],
+      a: 2,
+      l: 1,
+      reason: "النباتات تحتاج الضوء في التركيب الضوئي."
+    },
+    {
+      text: "Red litmus in base turns:",
+      choices: ["Red", "Blue", "Green", "Colorless"],
+      a: 1,
+      l: 1,
+      reason: "الورقة الحمراء تتحول للأزرق في القاعدة."
+    },
+    {
+      text: "Example of metamorphic rock?",
+      choices: ["Sandstone", "Granite", "Marble", "Basalt"],
+      a: 2,
+      l: 1,
+      reason: "الرخام صخر متحول."
+    },
+    {
+      text: "If KE increases 4×, speed change is:",
+      choices: ["Double", "Quadruple", "Halve", "Same"],
+      a: 0,
+      l: 1,
+      reason: "طاقة الحركة ∝ v²."
+    },
+    {
+      text: "Which is NOT step in rock cycle?",
+      choices: ["Melting", "Cooling magma", "Photosynthesis", "Erosion & compaction"],
+      a: 2,
+      l: 1,
+      reason: "التركيب الضوئي ليس جزء من دورة الصخور."
+    },
+    {
+      text: "Acid + zinc produces:",
+      choices: ["Hydrogen gas + salt", "Oxygen + base", "CO₂ + water", "No reaction"],
+      a: 0,
+      l: 1,
+      reason: "Zn + HCl → H₂ + ZnCl₂."
+    },
+    {
+      text: "Which is genetic mutation?",
+      choices: ["Haircut", "DNA sequence change", "Learned skill", "Eye color variation"],
+      a: 1,
+      l: 1,
+      reason: "الطفرة تغيير في ترتيب الـDNA."
+    },
+    {
+      text: "KE max in pendulum at:",
+      choices: ["Highest point", "Lowest point", "All points", "No KE"],
+      a: 1,
+      l: 1,
+      reason: "أقصى سرعة في الأسفل."
+    },
+    {
+      text: "Process forming clouds is:",
+      choices: ["Evaporation", "Condensation", "Precipitation", "Infiltration"],
+      a: 1,
+      l: 1,
+      reason: "التكثف يكون السحب."
+    },
+    {
+      text: "Car speed 10→20 m/s, KE becomes:",
+      choices: ["Same", "2×", "4×", "½×"],
+      a: 2,
+      l: 1,
+      reason: "(20/10)²=4."
+    },
+    {
+      text: "Primary consumer example?",
+      choices: ["Grass", "Rabbit", "Snake", "Bacteria"],
+      a: 1,
+      l: 2,
+      reason: "الأرنب عاشب يستهلك النباتات."
+    },
+    {
+      text: "SI unit of energy?",
+      choices: ["Watt", "Joule", "Volt", "Ampere"],
+      a: 1,
+      l: 2,
+      reason: "الجول وحدة الطاقة."
+    },
+    {
+      text: "Igneous rock forms from:",
+      choices: ["Sediments", "Magma cooling", "Heat & pressure", "Photosynthesis"],
+      a: 1,
+      l: 2,
+      reason: "الصخور النارية من الصهارة."
+    },
+    {
+      text: "HCl + water → pH:",
+      choices: ["<7", ">7", "7", "Undefined"],
+      a: 0,
+      l: 2,
+      reason: "الحامض يقلل pH أقل من 7."
+    },
+    {
+      text: "Which is NOT a producer?",
+      choices: ["Algae", "Grass", "Oak tree", "Lion"],
+      a: 3,
+      l: 2,
+      reason: "الأسد مفترس وليس منتج."
+    },
+    {
+      text: "Rock from high pressure & heat:",
+      choices: ["Basalt", "Limestone", "Slate", "Granite"],
+      a: 2,
+      l: 2,
+      reason: "الأردواز صخر متحول."
+    },
+    {
+      text: "Identical twins share:",
+      choices: ["Different DNA", "Same DNA", "No DNA", "Mix post birth"],
+      a: 1,
+      l: 2,
+      reason: "ينتجان من نفس البيضة."
+    },
+    {
+      text: "Which is NOT in water cycle?",
+      choices: ["Evaporation", "Condensation", "Precipitation", "Polymerization"],
+      a: 3,
+      l: 2,
+      reason: "البلمرة ليست جزء من دورة الماء."
+    },
+    {
+      text: "Photosynthesis byproduct released is:",
+      choices: ["Oxygen", "CO₂", "Glucose", "Nitrogen"],
+      a: 0,
+      l: 2,
+      reason: "النباتات تطرح O₂."
+    },
+    {
+      text: "Highest gravitational PE when:",
+      choices: ["10kg on ground", "5kg@10m", "1kg@20m", "10kg@20m"],
+      choices: ["10kg on ground", "5kg@10m", "1kg@20m", "10kg@20m"],
+      a: 3,
+      l: 3,
+      reason: "PE = mgh أكبر عند أكبر m و h."
+    },
+    {
+      text: "Steel from smelting is:",
+      choices: ["Limestone", "Obsidian", "Steel", "Marble"],
+      a: 2,
+      l: 3,
+      reason: "الفولاذ صناعي."
+    },
+    {
+      text: "Substance dissolving NaCl yields:",
+      choices: ["Na⁺ + Cl⁻", "H⁺ + Cl⁻", "Na⁺ + OH⁻", "No dissociation"],
+      a: 0,
+      l: 3,
+      reason: "NaCl يملح وينفكك."
+    },
+    {
+      text: "If height doubled, PE:",
+      choices: ["2×", "4×", "½×", "Same"],
+      a: 0,
+      l: 3,
+      reason: "PE ∝ h."
+    }
+  ]
+};
+
+let sec = 'unit1', total = 0, correct = 0, timeLeft = 5400, timerInt;
+const quizEl = document.getElementById('quiz'),
+      scoreP = document.getElementById('scorePanel'),
+      scoreV = document.getElementById('scoreVal'),
+      timerEl = document.getElementById('timer'),
+      useT = document.getElementById('useTimer'),
+      retryBTN = document.getElementById('retryBtn');
+
+function startSection(){
+  clearInterval(timerInt);
+  correct = 0; total = quizes[sec].length;
+  scoreP.style.display='none'; quizEl.innerHTML='';
+  timeLeft = 5400; timerEl.textContent='01:30:00';
+  if(useT.checked) timerInt = setInterval(updateTimer,1000);
+
+  quizes[sec].forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.innerHTML = `
+      <h4>Q${i+1} (${["Easy","Normal","Hard","Very Hard"][q.l-1]})</h4>
+      <p>${q.text}</p>
+      <ul>${q.choices.map((c,j)=>
+        `<li><button data-i="${i}" data-j="${j}">${String.fromCharCode(65+j)}. ${c}</button></li>`
+      ).join('')}</ul>
+      <div class="feedback" id="fb${i}"></div>`;
+    quizEl.appendChild(card);
+  });
+
+  document.querySelectorAll('.question-card button').forEach(btn=>{
+    btn.onclick = () => {
+      const i = +btn.dataset.i, j = +btn.dataset.j, fb = document.getElementById('fb'+i);
+      if(fb.textContent) return;
+      if(j === quizes[sec][i].a){
+        fb.textContent = 'تمام كده! إجابتك صح.'; fb.style.color='green'; correct++;
+      } else {
+        const ans = quizes[sec][i].choices[quizes[sec][i].a];
+        fb.textContent = `لأ يا باشا، دي غلط. الصح: ${ans}، علشان كده ${quizes[sec][i].reason}`;
+        fb.style.color='red';
+      }
+      if([...document.querySelectorAll('.feedback')].every(f=>f.textContent)){
+        finishTest();
+      }
+    };
+  });
+}
+
+function updateTimer(){
+  if(timeLeft<=0){
+    clearInterval(timerInt);
+    quizEl.querySelectorAll('button').forEach(b=>b.disabled=true);
+    alert('الوقت انتهى! انت فشلت في الاختبار.');
+    showScore();
+    return;
+  }
+  timeLeft--;
+  const h = String(Math.floor(timeLeft/3600)).padStart(2,'0'),
+        m = String(Math.floor((timeLeft%3600)/60)).padStart(2,'0'),
+        s = String(timeLeft%60).padStart(2,'0');
+  timerEl.textContent = `${h}:${m}:${s}`;
+}
+
+function finishTest(){
+  clearInterval(timerInt);
+  showScore();
+}
+
+function showScore(){
+  scoreV.textContent = `${correct}/${total}`;
+  scoreP.style.display = 'block';
+}
+
+retryBTN.onclick = startSection;
+document.querySelectorAll('nav button').forEach(b=>{
+  b.onclick = () => {
+    document.querySelector('nav .active').classList.remove('active');
+    b.classList.add('active');
+    sec = b.dataset.sec;
+    startSection();
+  };
+});
+
+// بداية
+startSection();
+
+</script>
+</body>
+</html>
